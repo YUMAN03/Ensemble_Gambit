@@ -6,21 +6,21 @@ This was developed as part of a course on Natural Language Processing (NLP) and 
 
 ## 🎯 Core Strategy
 
-The problem is framed as a **Masked Language Modeling** task. The model is given a word with some letters hidden (e.g., `a p p _ e`) and is trained to predict the missing characters.
+The problem is framed as a **Masked Language Modeling** task. In the classic Hangman game, the model starts with a word where all letters are hidden (e.g., `_ _ _ _ _`) and must guess letters one at a time. As correct guesses are made, those letters are revealed in their positions (e.g., `a _ _ _ e`), and the model uses this partial information to predict the next most likely letter.
 
 The final solver is not a single model but an **ensemble** of three specialist models whose predictions are combined through a weighted sum:
 
-1. **🧠 Bidirectional LSTM (Bi-LSTM):** The sequential expert. It reads the word in both directions (left-to-right and right-to-left) to understand the immediate context of each character.
+1. **🧠 Bidirectional LSTM (Bi-LSTM):** The sequential expert. It reads the word pattern in both directions (left-to-right and right-to-left) to understand the immediate context around each revealed and hidden character.
 
 2. **✨ Character-level CNN (CharCNN):** The spatial pattern detector. It uses convolutional filters to identify common and meaningful character chunks (morphemes) like prefixes (`un-`, `re-`) and suffixes (`-ing`, `-able`).
 
-3. **⚙️ Transformer:** The attention specialist. It uses a self-attention mechanism to weigh the importance of every character in relation to all other characters in the word, capturing long-range dependencies.
+3. **⚙️ Transformer:** The attention specialist. It uses a self-attention mechanism to weigh the importance of every character position in relation to all other positions in the word, capturing long-range dependencies.
 
 By combining these three distinct approaches, the solver makes more robust and intelligent guesses than any single model could alone.
 
 ## ✨ Key Features
 
-* **Dynamic Data Augmentation:** Instead of creating a massive, static dataset of masked words, new masks are generated **on-the-fly** for every word in every epoch. This creates a near-infinite stream of unique training examples and prevents the model from simply memorizing answers.
+* **Dynamic Data Augmentation:** Instead of creating a massive, static dataset of masked words, new masks are generated **on-the-fly** for every word in every epoch. This simulates the real Hangman game by creating various stages of partial word revelation, from completely blank to nearly complete.
 
 * **Intelligent Prediction Logic:** The model doesn't just guess the most likely letter for a single blank. Instead, it calculates the probability of every unguessed letter across *all* available blanks and chooses the one with the highest overall chance of being in the word.
 
